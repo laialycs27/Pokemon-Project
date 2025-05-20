@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pokemon Search</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>Search for a Pokémon</h1>
+
+  <!--  Search area with all fields and buttons -->
+  <div class="input-group">
+    <!-- Input fields -->
+    <input id="pokemonIDInput" type="number" placeholder="Enter Pokémon ID" />
+    <input id="pokemonTypeInput" type="text" placeholder="Enter Pokémon Type" />
+    <input id="pokemonAbilityInput" type="text" placeholder="Enter Pokémon Ability" />
+
+    <!-- Search and nav buttons -->
+    <button onclick="searchPokemon()">Search</button>
+    <button onclick="location.href='favorites.html'">⭐ Go to Favorites</button>
+    <button onclick="location.href='extra.html'">🎵 Pokémon Theme Song</button>
+  </div>
+
+  <!-- Search result display -->
+  <div id="result"></div>
+
+  <!-- JS file -->
+  <script src="script.js"></script>
+</body>
+</html>

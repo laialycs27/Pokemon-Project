@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favorite Pokemon</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h1>My Favorite Pokemon</h1>
+
+    <!-- Sort options -->
+    <label for="sortBy">Sort by:</label>
+    <select id="sortBy" onchange="renderFavorites()">
+      <option value="name">Name</option>
+      <option value="id">ID</option>
+    </select>
+  
+    <!-- List of favorites -->
+    <div id="favoritesList"></div>
+  
+    <!-- Buttons -->
+    <div class="footer-buttons">
+        <button onclick="downloadJSON()"> Download JSON</button>
+        <button onclick="location.href='index.html'"> Back to Search</button>
+      </div>
+      
+    
+    <script src="favorites.js"></script>
+</body>
+</html>
