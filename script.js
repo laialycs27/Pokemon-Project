@@ -1,83 +1,85 @@
-//Determines which field the user filled and sends an API request.
+// Determines which search category the user selected (ID, type, or ability),
+// performs the correct API request, and displays a Pokémon result
 function searchPokemon() {
-    //Gets the value the user entered
-    const id = document.getElementById("pokemonIDInput").value;
-    const type = document.getElementById("pokemonTypeInput").value.toLowerCase();
-    const ability = document.getElementById("pokemonAbilityInput").value.toLowerCase();
+    const category = document.getElementById("searchCategory").value;
+    const input = document.getElementById("searchInput").value.toLowerCase();
   
-    if (id) {
-      //Makes an API call to PokeAPI to fetch Pokemon by ID
-      fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+    if (!input) {
+      alert("Please enter a value to search.");
+      return;
+    }
+  
+    if (category === "id") {
+      // Directly fetch Pokémon by ID
+      fetch(`https://pokeapi.co/api/v2/pokemon/${input}`)
         .then(res => res.json())
-
-        //If the API succeeds, call displayPokemon() to show the result
-        .then(data => displayPokemon(data)
-    )
-        //If there's an error, show a message
+        .then(data => displayPokemon(data))
         .catch(() => showError());
-    } else if (type) {
-      fetch(`https://pokeapi.co/api/v2/type/${type}`)
-        .then(res => res.json())
-        .then(data => {
-          const results = data.pokemon.slice(0, 10);
-          document.getElementById("result").innerHTML = "";
-          results.forEach(p => {
-            fetch(p.pokemon.url)
-              .then(res => res.json())
-              .then(data => displayPokemon(data));
-          });
-        })
-        .catch(() => showError());
-    } else if (ability) {
-      fetch(`https://pokeapi.co/api/v2/ability/${ability}`)
+  
+    } else if (category === "type") {
+      // Fetch the first Pokémon that matches the given type
+      fetch(`https://pokeapi.co/api/v2/type/${input}`)
         .then(res => res.json())
         .then(data => {
-          const results = data.pokemon.slice(0, 10);
-          document.getElementById("result").innerHTML = "";
-          results.forEach(p => {
-            fetch(p.pokemon.url)
-              .then(res => res.json())
-              .then(data => displayPokemon(data));
-          });
+          const firstPokemon = data.pokemon[0].pokemon.name;
+          return fetch(`https://pokeapi.co/api/v2/pokemon/${firstPokemon}`);
         })
+        .then(res => res.json())
+        .then(data => displayPokemon(data))
         .catch(() => showError());
-    } else {
-      showError("Please enter at least one search field.");
+  
+    } else if (category === "ability") {
+      // Fetch the first Pokémon that has the given ability
+      fetch(`https://pokeapi.co/api/v2/ability/${input}`)
+        .then(res => res.json())
+        .then(data => {
+          const firstPokemon = data.pokemon[0].pokemon.name;
+          return fetch(`https://pokeapi.co/api/v2/pokemon/${firstPokemon}`);
+        })
+        .then(res => res.json())
+        .then(data => displayPokemon(data))
+        .catch(() => showError());
     }
   }
   
+  // Renders the Pokémon's data (name, image, type, abilities) to the HTML result container
   function displayPokemon(data) {
-    localStorage.setItem("lastSearch", JSON.stringify(data));
-    //Extracts name, types, image, abilities.
     const name = data.name;
-    const id = data.id;
     const image = data.sprites.front_default;
-    const types = data.types.map(t => t.type.name).join(", ");
+    const type = data.types[0].type.name;
     const abilities = data.abilities.map(a => a.ability.name).join(", ");
   
-    //Builds a card and adds a button to add to favorites
     const html = `
-      <div class="pokemon-card">
-        <h2>${name} (#${id})</h2>
-        <img src="${image}" alt="${name}" />
-        <p><strong>Type:</strong> ${types}</p>
-        <p><strong>Abilities:</strong> ${abilities}</p>
-        <button onclick="addToFavorites(${id})">Add to Favorites</button>
-      </div>
+      <h2>${name} (#${data.id})</h2>
+      <img src="${image}" alt="${name}">
+      <p><strong>Type:</strong> ${type}</p>
+      <p><strong>Abilities:</strong> ${abilities}</p>
+      <button onclick="addToFavorites(${data.id})">Add to Favorites</button>
     `;
   
-    document.getElementById("result").innerHTML += html;
+    document.getElementById("result").innerHTML = html;
+  
+    // Save last search result to localStorage
+    localStorage.setItem("lastSearch", JSON.stringify(data));
   }
-  //Loads the current favorites from localStorage
+  
+  // Displays a default or custom error message
+  function showError(message = "No Pokémon found.") {
+    document.getElementById("result").innerHTML = `<p>${message}</p>`;
+  }
+  
+  // Adds a Pokémon to the user's favorites list using localStorage
   function addToFavorites(id) {
     const saved = localStorage.getItem("favorites");
     const favorites = saved ? JSON.parse(saved) : [];
   
+    // Prevent duplicates
     if (favorites.some(p => p.id === id)) {
       alert("This Pokémon is already in your favorites!");
       return;
     }
   
+    // Fetch Pokémon data and store in favorites
     fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
       .then(res => res.json())
       .then(data => {
@@ -89,22 +91,16 @@ function searchPokemon() {
           abilities: data.abilities.map(a => a.ability.name)
         };
   
-        //Adds the new one and saves back to localStorage
         favorites.push(pokemon);
         localStorage.setItem("favorites", JSON.stringify(favorites));
         alert(`${pokemon.name} added to favorites!`);
       })
       .catch(err => {
-        console.error("Failed to fetch Pokemon for favorites", err);
+        console.error("Failed to fetch Pokémon for favorites", err);
       });
   }
   
-  //Shows a error message inside the page.
-  function showError(message = "No Pokemon found ") {
-    document.getElementById("result").innerHTML = `<p>${message}</p>`;
-  }
-  
-  // When the page loads, it checks if there’s a previously searched Pokemon and redisplays it.
+  // When the page loads, redisplay the last searched Pokémon (if available)
   window.onload = function () {
     const last = localStorage.getItem("lastSearch");
     if (last) {
