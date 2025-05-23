@@ -1,44 +1,63 @@
 // Search logic based on dropdown and input value
+// Handles searching by ID, Type, or Ability
 function searchPokemon() {
     const category = document.getElementById("searchCategory").value;
-    const input = document.getElementById("searchInput").value.toLowerCase().trim();
+    const input = document.getElementById("searchInput").value.trim().toLowerCase();
 
     if (!input) {
-        alert("Please enter a value to search.");
+        alert("Please enter a search term.");
         return;
     }
 
+    const resultContainer = document.getElementById("result");
+    resultContainer.innerHTML = "Loading...";
+
+    // ID search
     if (category === "id") {
         fetch(`https://pokeapi.co/api/v2/pokemon/${input}`)
-            .then(res => res.json())
-            .then(data => displayPokemons([data]))
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(data => displayPokemons([data])) // wrap in array for consistency
             .catch(() => showError());
 
+    // Type search
     } else if (category === "type") {
         fetch(`https://pokeapi.co/api/v2/type/${input}`)
-            .then(res => res.json())
-            .then(async data => {
-                const promises = data.pokemon.map(p =>
-                    fetch(p.pokemon.url).then(res => res.json())
-                );
-                const results = await Promise.all(promises);
-                displayPokemons(results);
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
             })
+            .then(data => {
+                const pokemonEntries = data.pokemon.slice(0, 10); // Limit to 10
+                const fetches = pokemonEntries.map(entry =>
+                    fetch(entry.pokemon.url).then(res => res.json())
+                );
+                return Promise.all(fetches);
+            })
+            .then(pokemonList => displayPokemons(pokemonList))
             .catch(() => showError());
 
+    // Ability search
     } else if (category === "ability") {
         fetch(`https://pokeapi.co/api/v2/ability/${input}`)
-            .then(res => res.json())
-            .then(async data => {
-                const promises = data.pokemon.map(p =>
-                    fetch(p.pokemon.url).then(res => res.json())
-                );
-                const results = await Promise.all(promises);
-                displayPokemons(results);
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
             })
+            .then(data => {
+                const pokemonEntries = data.pokemon.slice(0, 10);
+                const fetches = pokemonEntries.map(entry =>
+                    fetch(entry.pokemon.url).then(res => res.json())
+                );
+                return Promise.all(fetches);
+            })
+            .then(pokemonList => displayPokemons(pokemonList))
             .catch(() => showError());
     }
 }
+
 
 // Render one or many Pokémon as cards
 function displayPokemons(pokemonList) {
