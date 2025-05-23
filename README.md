@@ -28,7 +28,7 @@ Built as part of a web development course using **HTML**, **CSS**, and **JavaScr
 ## Live Demo
 
 > Try it online here:  
-> [https://laialycs27.github.io/pokemon-search-app/](https://laialycs27.github.io/pokemon-search-app/)
+> [https://github.com/laialycs27/Pokemon-Project](https://github.com/laialycs27/Pokemon-Project)
 
 ---
 
