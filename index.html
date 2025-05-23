@@ -9,13 +9,24 @@
 
   <h1>Search for a Pokémon</h1>
 
-  <div class="input-group">
-    <input id="pokemonIDInput" type="number" placeholder="Enter Pokémon ID" />
-    <input id="pokemonTypeInput" type="text" placeholder="Enter Pokémon Type" />
-    <input id="pokemonAbilityInput" type="text" placeholder="Enter Pokémon Ability" />
+  <!-- One input + dropdown + search button -->
+  <div class="search-container">
+    <select id="searchCategory">
+      <option value="id">Search by ID</option>
+      <option value="type">Search by Type</option>
+      <option value="ability">Search by Ability</option>
+    </select>
+    <input id="searchInput" type="text" placeholder="Enter your search..." />
     <button onclick="searchPokemon()">Search</button>
   </div>
 
+  <!-- Action buttons -->
+  <div class="button-group">
+    <button onclick="location.href='favorites.html'">⭐ Go to Favorites</button>
+    <button onclick="location.href='extra.html'">🎵 Pokémon Theme Song</button>
+  </div>
+
+  <!-- Results will appear here -->
   <div id="result"></div>
 
   <script src="script.js"></script>
